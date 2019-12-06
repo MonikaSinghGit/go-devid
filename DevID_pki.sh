@@ -1,6 +1,3 @@
-   # edit directory here, or override
-   #export cadir=${rt}/ca
-   #mkdir $cadir
    sq=45
    export rt=root
    mkdir $rt
