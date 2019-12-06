@@ -550,7 +550,7 @@ func main() {
 	fmt.Print("Enter the DevID Module: ")
 	var DevID string
 	fmt.Scanln(&DevID)
-	fmt.Print(certFldr+"+++++++++++++++"+DevID)
+	
 	exst1 := issExist(certFldr+DevID)
 
 	if exst1 == false {
