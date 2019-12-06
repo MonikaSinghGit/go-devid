@@ -13,6 +13,6 @@
     — Signing\
     — Enable/disable DevID credential\
     — Enable/disable of DevID key\
-    Step 1. on running DevIDServices.go enter the DevID Modules available in the cert folder. ex. DevID46\
+    Step 1. on running DevIDServices.go enter the DevID Modules available in the cert folder. ex. DevID45\
     Step 2. First, initialize the DevId.\
     Step 3. select the desired operation.
