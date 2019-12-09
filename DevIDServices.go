@@ -25,6 +25,8 @@ type PubKeystrct struct {
 	enable            bool
 }
 
+
+
 type DevIDCredentialstrct struct {
 	credentialIndex int
 	pubkeyIndex     int
@@ -207,6 +209,73 @@ func EnumerationOfDevIDPublicKey() []PubKeystrct {
 
 }
 
+
+
+
+
+func EnumerationOfDevIDPrivateKey(keyIndex int) *ecdsa.PrivateKey {
+
+	var flg bool
+	//var r, s *big.Int
+	//r = nil
+	//s = nil
+	flg = false
+		if pblcKeyTbl[keyIndex].enable == true {
+			pub := pblcKeyTbl[keyIndex].publicKeyMaterial
+			files, err := ioutil.ReadDir(DevIDSecrets)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for _, file := range files {
+				prvtfile := DevIDSecrets + file.Name()
+				keyjson, err := ioutil.ReadFile(prvtfile)
+				if err != nil {
+					panic(err)
+				}
+				prvtKey, _ := pem.Decode([]byte(keyjson))
+				if prvtKey == nil {
+					panic("failed to parse PEM block containing the public key")
+				}
+				prvt, err := x509.ParsePKCS8PrivateKey(prvtKey.Bytes)
+				fmt.Println("Private Bytes : ",prvtKey,"\n")
+				prvtPub := prvt.(*ecdsa.PrivateKey).Public()
+				var pub1 *ecdsa.PublicKey
+				var pub2 *ecdsa.PublicKey
+				pub1 = pub
+				pub2 = prvtPub.(*ecdsa.PublicKey)
+				if pub1.X.Cmp(pub2.X) == 0 && pub1.Y.Cmp(pub2.Y) == 0 {
+					//msg := dataOctets
+					//hash := sha256.Sum256([]byte(msg))
+					//r, s, err := ecdsa.Sign(rand.Reader, prvt.(*ecdsa.PrivateKey), hash[:])
+					
+					flg = true
+					return prvt.(*ecdsa.PrivateKey)
+				}
+
+			}
+
+			if flg == false {
+				fmt.Println("Private key not found!!")
+			}
+
+		} else {
+			fmt.Println("Public key is not enabled!!")
+			return nil
+		}
+
+	
+	return nil
+}
+
+
+
+
+
+
+
+
+
 func EnumerationOfDevIDCredentials() []DevIDCredentialstrct {
 
 	dvMdl2 := DevIDModule
@@ -353,6 +422,13 @@ func EnumerationOfDevIDCredentialChain(credentialIndex int) []DevIDCredentialCha
 
 }
 
+
+
+
+
+
+
+
 func Signing(keyIndex int, currentEncoding string, dataLength int, dataOctets string) (bool, *big.Int, *big.Int) {
 
 	var flg bool
@@ -387,6 +463,7 @@ func Signing(keyIndex int, currentEncoding string, dataLength int, dataOctets st
 				if pub1.X.Cmp(pub2.X) == 0 && pub1.Y.Cmp(pub2.Y) == 0 {
 					msg := dataOctets
 					hash := sha256.Sum256([]byte(msg))
+					//fmt.Println(prvt.(*ecdsa.PrivateKey))
 					r, s, err := ecdsa.Sign(rand.Reader, prvt.(*ecdsa.PrivateKey), hash[:])
 					if err != nil {
 						panic(err)
@@ -574,12 +651,13 @@ func main() {
 				"2. for Enumeration of DevID Public Key\n" +
 				"3. for Enumeration of DevID credential\n" +
 				"4. for Enumeration of a DevID credential chain\n" +
-				"5. for singing\n " +
-				"6. for Enabling DevID Credential\n" +
-				"7. for Disable DevID Credential\n" +
-				"8. for Enabling DevID key\n" +
-				"9. for Disable DevID key\n" +
-				"10. for exit\n")
+				"5. for Enumeration of DevID Private Key\n" +
+				"6. for singing\n " +
+				"7. for Enabling DevID Credential\n" +
+				"8. for Disable DevID Credential\n" +
+				"9. for Enabling DevID key\n" +
+				"10. for Disable DevID key\n" +
+				"0. for exit\n")
 			fmt.Scanln(&inpt)
 
 			switch inpt {
@@ -644,7 +722,41 @@ func main() {
 					fmt.Println("Please enter the correct DevID credential index!")
 				}
 
+
 			case 5:
+
+				//var currentEncoding, dataOctets string
+				//var dataLength int
+				//currentEncoding = "ECDSADIGESTINFO_OPAQUE"
+				//fmt.Println("Enter the data to be signed:\n")
+				//fmt.Scanln(&dataOctets)
+				//dataLength = len(dataOctets)
+				//var pvtky *ecdsa.PublicKey
+				//var flg bool
+				if pblcKeyTbl[0].publicKeyMaterial == nil {
+					fmt.Println("Enumerate Public key first!!")
+				}else{
+				var crPubindx int
+				crPubindx = -1
+				fmt.Println("Enter the public key index:\n")
+				fmt.Scanln(&crPubindx)
+				if (0 <= crPubindx) && (crPubindx < len(pblcKeyTbl)) {
+					fmt.Println("******************Private Key******************************************************\n")
+					pvtky := EnumerationOfDevIDPrivateKey(crPubindx)
+					//prvtpubstr := string(pvtky)
+					
+					fmt.Println("Entire x509 ECDSA Private Key: ", pvtky, "\n")
+					fmt.Println("Private Key Big Int portion: ", pvtky.D, "\n")
+					fmt.Printf("Private Key Big Int portion in hex: %x\n\n ", pvtky.D)
+				} else {
+					fmt.Println("Please enter the correct public key index!")
+
+				}
+
+
+			}
+
+			case 6:
 
 				var currentEncoding, dataOctets string
 				var dataLength int
@@ -666,7 +778,7 @@ func main() {
 
 				}
 
-			case 6:
+			case 7:
 				fmt.Println("*******DevIDCredential Enable***********************")
 				var flgEnable bool
 				var crindx1 int
@@ -685,7 +797,7 @@ func main() {
 					fmt.Println("Please enter the correct DevID credential index!")
 				}
 
-			case 7:
+			case 8:
 
 				fmt.Println("*****DevIDCredential Disable*************")
 				var flgDisable bool
@@ -704,7 +816,7 @@ func main() {
 					fmt.Println("Please enter the correct DevID credential index!")
 				}
 
-			case 8:
+			case 9:
 				fmt.Println("****DevID Key Ennable*********")
 				var flgKeyEnable bool
 				var keyindx1 int
@@ -723,7 +835,7 @@ func main() {
 
 				}
 
-			case 9:
+			case 10:
 				fmt.Println("******DevID Key Disable**********************")
 				var flgKeyDisable bool
 				var keyindx2 int
@@ -741,8 +853,8 @@ func main() {
 
 				}
 
-			case 10:
-				break
+			case 0:
+				os.Exit(1)
 			default:
 
 				fmt.Println("Select from the operation listed below (1-10)!!!")
