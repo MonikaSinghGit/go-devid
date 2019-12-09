@@ -1,4 +1,4 @@
-   sq=45
+   sq=47
    export rt=root
    mkdir $rt
    
@@ -22,7 +22,7 @@
    if [ ! -f serial ]; then echo 00 >serial; fi
    )
 
-   sn=8
+   sn=9
 
    # edit these to suit
    countryName="/C=US"

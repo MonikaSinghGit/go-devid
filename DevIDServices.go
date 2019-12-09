@@ -446,6 +446,7 @@ func DevIDCredentialDisable(credentialIndex int) bool {
 	}
 	return credflg
 }
+
 func DevIDKeyEnable(keyIndex int) bool {
 	var keyflg bool
 	if pblcKeyTbl[keyIndex].publicKeyMaterial == nil {
@@ -543,13 +544,13 @@ func main() {
 	}
 	cfgstr := string(cnfgFile[:])
 	DevIDLocation := strings.Split(cfgstr, "DevIDLocation=")
-	certFldr:=strings.TrimSpace(DevIDLocation[1])
+	certFldr := strings.TrimSpace(DevIDLocation[1])
 
 	fmt.Print("Enter the DevID Module: ")
 	var DevID string
 	fmt.Scanln(&DevID)
-	
-	exst1 := issExist(certFldr+DevID)
+
+	exst1 := issExist(certFldr + DevID)
 
 	if exst1 == false {
 		fmt.Println("DevID module not found!!!")
@@ -568,12 +569,22 @@ func main() {
 		var signR, signS *big.Int
 
 		for inpt != 10 {
-			fmt.Println("Select the operation:\n 1. for Initialization\t\t\t2. for Enumeration of DevID Public Key\t\t3. for Enumeration of DevID credential\t\t4. for Enumeration of a DevID credential chain\t\t 5. for singing\n 6. for Enabling DevID Credential\t7. for Disable DevID Credential\t\t\t8. for Enabling DevID key\t\t\t9. for Disable DevID key\t\t\t\t10. for exit\n")
+			fmt.Println("Select the operation:\n " +
+				"1. for Initialization\n" +
+				"2. for Enumeration of DevID Public Key\n" +
+				"3. for Enumeration of DevID credential\n" +
+				"4. for Enumeration of a DevID credential chain\n" +
+				"5. for singing\n " +
+				"6. for Enabling DevID Credential\n" +
+				"7. for Disable DevID Credential\n" +
+				"8. for Enabling DevID key\n" +
+				"9. for Disable DevID key\n" +
+				"10. for exit\n")
 			fmt.Scanln(&inpt)
 
 			switch inpt {
 			case 1:
-				fmt.Println("*******************************************************************Intialization***********************************************************************************************************************")
+				fmt.Println("************Intialization***************")
 				fg = initialization()
 				fmt.Println(" Intialization: ", fg, "\n")
 
@@ -582,10 +593,13 @@ func main() {
 				if pblcKeyTbl[0].publicKeyMaterial == nil {
 					pblcKeyTbl = EnumerationOfDevIDPublicKey()
 				}
-				fmt.Println("*******************************************************************Enumeration of DevID Public key***************************************************************************************************************************\n")
+				fmt.Println("***********Enumeration of DevID Public key*******\n")
 				fmt.Println("KeyIndex | Status |  Key Material")
 				for i := 0; i < len(pblcKeyTbl); i++ {
-					fmt.Println("  ", pblcKeyTbl[i].keyIndex, "    | ", pblcKeyTbl[i].enable, " | ", pblcKeyTbl[i].publicKeyMaterial)
+					fmt.Printf("%d|%b|%v\n", 
+						pblcKeyTbl[i].keyIndex,  
+						pblcKeyTbl[i].enable,  
+						pblcKeyTbl[i].publicKeyMaterial)
 				}
 
 				fmt.Println("\n")
@@ -594,10 +608,13 @@ func main() {
 				if devIDCredentialTbl[0].credential == nil {
 					devIDCredentialTbl = EnumerationOfDevIDCredentials()
 				}
-				fmt.Println("*******************************************************************DevID Credentials***************************************************************************************************************************")
+				fmt.Println("*******DevID Credentials*******************")
 				fmt.Println("CredentialIndex | KeyIndex | Status |  Credential")
 				for i := 0; i < len(pblcKeyTbl); i++ {
-					fmt.Println("       ", devIDCredentialTbl[i].credentialIndex, "      |    ", devIDCredentialTbl[i].pubkeyIndex, "   | ", devIDCredentialTbl[i].enable, " | ", devIDCredentialTbl[i].credential, "\n")
+					fmt.Printf("%d|%d|%b|%v\n", devIDCredentialTbl[i].credentialIndex,  
+					devIDCredentialTbl[i].pubkeyIndex,  
+					devIDCredentialTbl[i].enable,  
+					devIDCredentialTbl[i].credential)
 				}
 
 			case 4:
@@ -611,13 +628,15 @@ func main() {
 
 					devIDCredentialchain = nil
 					devIDCredentialchain = EnumerationOfDevIDCredentialChain(crindx)
-					fmt.Println("******************************************************************Enumeration Chain Credentials************************************************************************************************************************")
+					fmt.Println("**********Enumeration Chain Credentials****************************************")
 					if len(devIDCredentialchain) == 0 {
 						fmt.Println(" Chain cert not found!! ", "\n")
 					} else {
 						fmt.Println("ChainIndex | Chain Credential")
 						for i := 0; i < len(devIDCredentialchain); i++ {
-							fmt.Println("  ", devIDCredentialchain[i].credentialChainIndex, "    | ", devIDCredentialchain[i].credentialChainCredential, "\n")
+							fmt.Println("%d|%v\n", 
+								devIDCredentialchain[i].credentialChainIndex, 
+								devIDCredentialchain[i].credentialChainCredential)
 						}
 					}
 
@@ -640,7 +659,7 @@ func main() {
 				fmt.Scanln(&crPubindx)
 				if (0 <= crPubindx) && (crPubindx < len(pblcKeyTbl)) {
 					flg, signR, signS = Signing(crPubindx, currentEncoding, dataLength, dataOctets)
-					fmt.Println("******************************************************************Signing****************************************************************************************************************************************\n")
+					fmt.Println("******************Signing******************************************************\n")
 					fmt.Println("Status:", flg, "Signature: ", signR, signS, "\n")
 				} else {
 					fmt.Println("Please enter the correct public key index!")
@@ -648,7 +667,7 @@ func main() {
 				}
 
 			case 6:
-				fmt.Println("******************************************************************DevIDCredential Enable*************************************************************************************************************************")
+				fmt.Println("*******DevIDCredential Enable***********************")
 				var flgEnable bool
 				var crindx1 int
 				crindx1 = -1
@@ -668,7 +687,7 @@ func main() {
 
 			case 7:
 
-				fmt.Println("******************************************************************DevIDCredential Disable************************************************************************************************************************")
+				fmt.Println("*****DevIDCredential Disable*************")
 				var flgDisable bool
 				var crindx2 int
 				crindx2 = -1
@@ -686,7 +705,7 @@ func main() {
 				}
 
 			case 8:
-				fmt.Println("******************************************************************DevID Key Ennable******************************************************************************************************************************")
+				fmt.Println("****DevID Key Ennable*********")
 				var flgKeyEnable bool
 				var keyindx1 int
 				keyindx1 = -1
@@ -705,7 +724,7 @@ func main() {
 				}
 
 			case 9:
-				fmt.Println("******************************************************************DevID Key Disable******************************************************************************************************************************")
+				fmt.Println("******DevID Key Disable**********************")
 				var flgKeyDisable bool
 				var keyindx2 int
 				fmt.Println("Enter the public key index:\n")
@@ -734,5 +753,5 @@ func main() {
 		}
 
 	}
-	
+
 }
