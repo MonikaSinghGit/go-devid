@@ -239,6 +239,7 @@ func EnumerationOfDevIDPrivateKey(keyIndex int) *ecdsa.PrivateKey {
 				}
 				prvt, err := x509.ParsePKCS8PrivateKey(prvtKey.Bytes)
 				fmt.Println("Private Bytes : ",prvtKey,"\n")
+				fmt.Printf("Private Bytes in hex: %x\n\n ", prvtKey)
 				prvtPub := prvt.(*ecdsa.PrivateKey).Public()
 				var pub1 *ecdsa.PublicKey
 				var pub2 *ecdsa.PublicKey
@@ -747,7 +748,7 @@ func main() {
 					
 					fmt.Println("Entire x509 ECDSA Private Key: ", pvtky, "\n")
 					fmt.Println("Private Key Big Int portion: ", pvtky.D, "\n")
-					fmt.Printf("Private Key Big Int portion in hex: %x\n\n ", pvtky.D)
+					fmt.Printf("Private Key Big Int portion in hex: %x\n\n ", pvtky)
 				} else {
 					fmt.Println("Please enter the correct public key index!")
 
