@@ -22,8 +22,8 @@
    RANDFILE          = $dir/private/.rand
 
    # The root key and root certificate.
-   private_key       = $dir/private/8021ARintermediate.key.$format
-   certificate       = $dir/certs/8021ARintermediate.cert.$format
+   private_key       = $dir/private/ca.key.$format
+   certificate       = $dir/certs/ca.cert.$format
 
    # For certificate revocation lists.
    crlnumber         = $dir/crlnumber
@@ -35,7 +35,7 @@
    default_md        = sha256
 
    name_opt          = ca_default
-      cert_opt          = ca_default
+   cert_opt          = ca_default
    default_enddate   = 99991231235959Z # per IEEE 802.1AR
    preserve          = no
    policy            = policy_loose
